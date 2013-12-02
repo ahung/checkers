@@ -21,4 +21,22 @@ class Board
     (0..7).include?(pos[0]) &&
     (0..7).include?(pos[1])
   end
+  
+  # def to_s
+  #  output = ""
+  #  8.times do |row_index|
+  #    8.times do |col_index|
+  #      if @board[col_index, row_index] == []
+  #        piece_text = "  "
+  #      else
+  #        return @board[col_index, row_index].to_s
+  #        piece_text = "test"
+  #        #piece_text = @board[col_index, row_index].to_s
+  #      end
+  #      output += piece_text
+  #    end
+  #  end
+  #  output
+  # end
+
 end
