@@ -1,5 +1,8 @@
 require_relative 'board'
 
+class InvalidMoveError < StandardError
+end
+
 class Piece
 
   attr_accessor :king, :pos, :board
@@ -36,6 +39,31 @@ class Piece
     end
   end
   
+  def perform_moves!(sequence)
+    if sequence.length == 1
+      if self.valid_slide?(sequence[0])
+        self.perform_slide(sequence[0]) 
+      elsif self.valid_jump?(sequence[0])
+        self.perform_jump(sequence[0])
+      else 
+        raise InvalidMoveError.new
+      end
+    else
+      sequence.each do |pos|
+        raise InvalidMoveError.new unless self.valid_jump?(pos)
+        self.perform_jump(pos)
+      end
+    end  
+  end
+  
+  def perform_moves(sequence)
+    if valid_move_seq?(sequence)
+      perform_moves!(sequence)
+    else
+      raise InvalidMoveError.new
+    end
+  end
+  
   def perform_jump(pos)
     if valid_jump?(pos)
       @board[@pos] = nil
@@ -61,6 +89,17 @@ class Piece
     false
   end
   
+  def valid_move_seq?(sequence)
+    test_board = self.board.dup
+    test_piece = test_board[self.pos]
+    begin
+      test_piece.perform_moves!(sequence)
+    rescue InvalidMoveError
+      return false
+    end
+    true
+  end
+  
   def valid_jump?(pos)
     possible_moves = []
     self.moves_diff.each do |move|
@@ -69,8 +108,8 @@ class Piece
       if @board[enemy_pos] != nil && @board[enemy_pos].color != @color
         possible_moves << new_move
       end
-      possible_moves.include?(pos)
     end
+    possible_moves.include?(pos)
   end
   
   def valid_slide?(pos)
@@ -84,21 +123,23 @@ class Piece
     possible_moves.include?(pos) 
   end
   
-  # def to_s
-  #   if @color == :red
-  #     puts "\u26AA"
-  #   else
-  #     puts "\u26AB"
-  #   end
-  # end
+  def to_s
+    if @color == :red
+      #"\u26AA"
+      "R"
+    else
+      #"\u26AB"
+      "B"
+    end
+  end
 
 end
 
 board = Board.new
-#piece1 = Piece.new(:red, [0, 0], board)
+piece1 = Piece.new(:red, [0, 0], board)
 piece2 = Piece.new(:black, [1, 1], board)
-# p piece2.color
-p board
-p piece2.perform_slide([0, 0])
-p piece2
-# p board
+piece3 = Piece.new(:black, [1, 3], board)
+puts board
+piece1.perform_moves([[2, 2], [0, 4]])
+#piece1.perform_moves([[2, 2], [3, 3]])
+puts board
