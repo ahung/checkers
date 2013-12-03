@@ -30,7 +30,9 @@ class Game
     input.each do |pos|
       move_sequence << [Integer(pos[0]), Integer(pos[1])]
     end
+    raise InvalidMoveError.new if move_sequence.length == 1
     start_pos = move_sequence.shift
+    raise InvalidMoveError.new if @board[start_pos] == nil
     if @board[start_pos].color == @current_player
       @board[start_pos].perform_moves(move_sequence)
     else
