@@ -8,11 +8,11 @@ class Piece
   attr_accessor :king, :pos, :board
   attr_reader :color
 
-  def initialize(color, pos, board)
+  def initialize(color, pos, board, king = false)
     @color = color
     @pos = pos
     @board = board
-    @king = false
+    @king = king
     @board[pos] = self
   end
   
@@ -20,6 +20,7 @@ class Piece
   RED_MOVES = [[1, 1], [-1, 1]]
   
   def maybe_promote
+    return if @king == true
     if @color == :black && @pos[1] == 0
       @king = true
     elsif @color == :red && @pos[1] == 7
@@ -92,6 +93,7 @@ class Piece
   def valid_move_seq?(sequence)
     test_board = self.board.dup
     test_piece = test_board[self.pos]
+    p test_piece
     begin
       test_piece.perform_moves!(sequence)
     rescue InvalidMoveError
@@ -100,6 +102,7 @@ class Piece
     true
   end
   
+  #refactor valid_jump? and valid_slide? too similar
   def valid_jump?(pos)
     possible_moves = []
     self.moves_diff.each do |move|
@@ -124,22 +127,28 @@ class Piece
   end
   
   def to_s
-    if @color == :red
+    if @color == :red && @king == true
       #"\u26AA"
       "R"
-    else
+    elsif @color == :red && @king == false
+      "r"
+    elsif @color == :black && @king == true
       #"\u26AB"
       "B"
+    else
+      "b"
     end
   end
 
 end
 
-board = Board.new
-piece1 = Piece.new(:red, [0, 0], board)
-piece2 = Piece.new(:black, [1, 1], board)
-piece3 = Piece.new(:black, [1, 3], board)
-puts board
-piece1.perform_moves([[2, 2], [0, 4]])
-#piece1.perform_moves([[2, 2], [3, 3]])
-puts board
+# board = Board.new
+# board.populate_board
+# piece1 = Piece.new(:black, [1, 1], board)
+# puts board
+# piece1.perform_moves([[0, 0]])
+# puts board
+# p piece1.valid_move_seq?([1, 1])
+# piece1.perform_moves([[1, 1]])
+# puts board
+

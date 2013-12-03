@@ -7,6 +7,17 @@ class Board
   end
   
   def populate_board
+    8.times do |column|
+      if column.even?
+        Piece.new(:red, [column, 1], self)
+        Piece.new(:black, [column, 5], self)
+        Piece.new(:black, [column, 7], self)
+      else
+        Piece.new(:red, [column, 0], self)
+        Piece.new(:red, [column, 2], self)
+        Piece.new(:black, [column, 6], self)
+      end
+    end
   end
   
   def []=(pos, piece)
@@ -48,11 +59,22 @@ class Board
         current_piece = @board[col_index][row_index]
         new_piece = current_piece.class.new(current_piece.color,
                                             current_piece.pos.dup,
-                                            new_board)
+                                            new_board, current_piece.king)
         new_board.board[col_index][row_index] = new_piece
       end
     end
     new_board
+  end
+  
+  def select_pieces(color)
+    pieces = @board.flatten.compact.select do |piece|
+      piece.color == color
+    end
+  end
+  
+  def win?(color)
+    color == :black ? opp_color = :red : opp_color = :black
+    false unless select_pieces(opp_color) == []
   end
 
 end
